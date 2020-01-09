@@ -1,0 +1,18 @@
+2020-01-09 20:27:30,571 CRIT Supervisor running as root (no user in config file)
+2020-01-09 20:27:30,571 INFO Included extra file "/opt/docker/etc/supervisor.d/cron.conf" during parsing
+2020-01-09 20:27:30,571 INFO Included extra file "/opt/docker/etc/supervisor.d/dnsmasq.conf" during parsing
+2020-01-09 20:27:30,571 INFO Included extra file "/opt/docker/etc/supervisor.d/nginx.conf" during parsing
+2020-01-09 20:27:30,572 INFO Included extra file "/opt/docker/etc/supervisor.d/php-fpm.conf" during parsing
+2020-01-09 20:27:30,572 INFO Included extra file "/opt/docker/etc/supervisor.d/postfix.conf" during parsing
+2020-01-09 20:27:30,572 INFO Included extra file "/opt/docker/etc/supervisor.d/ssh.conf" during parsing
+2020-01-09 20:27:30,572 INFO Included extra file "/opt/docker/etc/supervisor.d/syslog.conf" during parsing
+2020-01-09 20:27:30,579 INFO RPC interface 'supervisor' initialized
+2020-01-09 20:27:30,579 INFO supervisord started with pid 1
+2020-01-09 20:27:31,583 INFO spawned: 'syslogd' with pid 76
+2020-01-09 20:27:31,586 INFO spawned: 'nginxd' with pid 77
+2020-01-09 20:27:31,587 INFO spawned: 'php-fpmd' with pid 78
+2020-01-09 20:27:31,588 INFO spawned: 'crond' with pid 79
+2020-01-09 20:27:31,592 INFO success: nginxd entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+2020-01-09 20:27:31,592 INFO success: php-fpmd entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+2020-01-09 20:27:31,592 INFO success: crond entered RUNNING state, process has stayed up for > than 0 seconds (startsecs)
+2020-01-09 20:27:32,659 INFO success: syslogd entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

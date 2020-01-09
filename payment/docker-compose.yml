@@ -1,0 +1,15 @@
+version: '3.7'
+services:
+  payment:
+    container_name: payment
+    build:
+      context: '.'
+      args:
+        - APP_ENV=development
+        - COMPOSER_NO_INTERACTION=0
+    image: payment
+    ports:
+      - 3006:80
+    volumes:
+      - ./src:/app
+    command: bash -c "composer update --lock --prefer-source && supervisord"
