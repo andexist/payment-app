@@ -16,3 +16,20 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// clients routes
+Route::prefix('clients')->group(function () {
+    Route::get('/', 'ClientController@getClients');
+    Route::get('/{id}', 'ClientController@getClient');
+    Route::get('{clientId}/accounts', 'ClientController@getClientAccounts');
+    Route::post('/create', 'ClientController@createClient');
+});
+
+// accounts routes
+Route::prefix('accounts')->group(function () {
+    Route::get('/', 'AccountController@getAccounts');
+    Route::get('/{id}', 'AccountController@getAccount');
+    Route::get('{accountId}/balance', 'AccountController@getAccountBalance');
+    Route::post('/create', 'AccountController@createAccount');
+});
+

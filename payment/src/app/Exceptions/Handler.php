@@ -3,7 +3,13 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response as HTTPResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class Handler extends ExceptionHandler
 {
@@ -27,10 +33,8 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Report or log an exception.
-     *
-     * @param  \Exception  $exception
-     * @return void
+     * @param Exception $exception
+     * @throws Exception
      */
     public function report(Exception $exception)
     {
@@ -38,14 +42,19 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param Exception $exception
+     * @return JsonResponse|Response
      */
     public function render($request, Exception $exception)
     {
-        return parent::render($request, $exception);
+        dd($exception);
+        if ($exception instanceof ValidationException) {
+            return response()->json(["message" => $exception->getMessage()] )
+                ->setStatusCode(HTTPResponse::HTTP_BAD_REQUEST);
+        } else if ($exception instanceof ApiException) {
+            return response()->json(["message" => $exception->getMessage()] )
+                ->setStatusCode($exception->getCode());
+        }
     }
 }
