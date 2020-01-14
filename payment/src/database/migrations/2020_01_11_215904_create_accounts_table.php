@@ -19,7 +19,7 @@ class CreateAccountsTable extends Migration
             $table->unsignedInteger('client_id')->index();
             $table->string('account_name');
             $table->string('iban', 21)->index();
-            $table->double('amount', 20, 2)->index();
+            $table->double('amount', 20, 2)->index()->default(0);
             $table->string('currency')
                 ->default(Account::AVAILABLE_CURRENCIES['eur']);
             $table->index(['created_at', 'updated_at']);

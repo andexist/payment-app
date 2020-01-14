@@ -6,7 +6,7 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Requests\CreateClientRequest;
 use App\Services\ClientService\ClientService;
 use Exception;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 
 class ClientController extends Controller

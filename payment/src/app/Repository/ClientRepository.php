@@ -36,10 +36,14 @@ class ClientRepository implements RepositoryInterface
      */
     public function create(array $data)
     {
-       /** @var Client $client */
-        $client = Client::query()->create($data);
+       Client::query()->create($data);
 
-        return $client->fresh();
+        return Client::query()->latest()->first([
+            'username',
+            'first_name',
+            'last_name',
+            'created_at'
+        ]);
     }
 
     public function update(int $id, array $data)

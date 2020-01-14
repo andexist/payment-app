@@ -70,7 +70,17 @@ class AccountService
     }
 
     /**
+     * @param int $clientId
+     * @return array
+     */
+    public function getByClientId(int $clientId)
+    {
+        return $this->accountRepository->getByClientId($clientId);
+    }
+
+    /**
      * @param array $data
+     * @return Account|Builder
      */
     public function create(array $data)
     {
@@ -78,6 +88,6 @@ class AccountService
         $preparedData = $this->accountHelper->prepareData($data);
 
         // create
-        $this->accountRepository->create($preparedData);
+        return $this->accountRepository->create($preparedData);
     }
 }

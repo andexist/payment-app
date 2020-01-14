@@ -33,3 +33,7 @@ Route::prefix('accounts')->group(function () {
     Route::post('/create', 'AccountController@createAccount');
 });
 
+// payments routes
+Route::prefix('payments')->group(function () {
+    Route::post('/create', 'PaymentController@createPayment');
+});

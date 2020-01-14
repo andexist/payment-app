@@ -1,0 +1,137 @@
+<?php
+
+namespace App\Services\PaymentService;
+
+use App\Account;
+use App\Repository\PaymentRepository;
+use App\Services\AccountService\AccountService;
+use App\Services\PaymentService\Utils\PaymentHelper;
+use Illuminate\Database\Eloquent\Builder;
+use App\Payment;
+use Illuminate\Database\Eloquent\Collection;
+
+/**
+ * Class PaymentService
+ * @package Services\PaymentService
+ */
+class PaymentService
+{
+    const MAX_PAYMENT_PER_HOUR = 10;
+    const MAX_PAYMENT_PER_HOUR_ERROR = 'Maximum 10 payments per hour.';
+
+    /**
+     * @var PaymentRepository
+     */
+    private $paymentRepository;
+
+    /**
+     * @var PaymentHelper
+     */
+    private $paymentHelper;
+
+    /**
+     * @var AccountService
+     */
+    private $accountService;
+
+    /**
+     * PaymentService constructor.
+     * @param PaymentRepository $paymentRepository
+     * @param PaymentHelper $paymentHelper
+     * @param AccountService $accountService
+     */
+    public function __construct(
+        PaymentRepository $paymentRepository,
+        PaymentHelper $paymentHelper,
+        AccountService $accountService
+    ) {
+        $this->paymentRepository = $paymentRepository;
+        $this->paymentHelper = $paymentHelper;
+        $this->accountService = $accountService;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAll()
+    {
+        return $this->paymentRepository->getAll();
+    }
+
+    /**
+     * @param int $id
+     * @return Payment|Builder
+     */
+    public function getById(int $id)
+    {
+        return $this->paymentRepository->getById($id);
+    }
+
+    /**
+     * @param int $clientId
+     * @return array
+     */
+    public function getClientAccountsIds(int $clientId)
+    {
+        return $this->accountService->getByClientId($clientId);
+    }
+
+    /**
+     * @param int $clientId
+     * @return int
+     */
+    public function getClientPaymentsPerLastHour(int $clientId)
+    {
+        return $this->paymentRepository->getClientPaymentsPerLastHour(
+            $this->getClientAccountsIds($clientId)
+        );
+    }
+
+    /**
+     * @param int $clientId
+     * @return float
+     */
+    public function getPaymentsAmountCount(int $clientId)
+    {
+        return $this->paymentRepository->getPaymentsAmountCount(
+            $this->getClientAccountsIds($clientId)
+        );
+    }
+
+    /**
+     * @param array $data
+     * @return Builder|Payment
+     */
+    public function create(array $data)
+    {
+        /** @var float $totalAmount */
+        $totalAmount = $this->getPaymentsAmountCount($data['accountId']);
+        /** @var array $preparedData */
+        $preparedData = $this->paymentHelper->prepareData($data, $totalAmount);
+
+        return $this->paymentRepository->create($preparedData);
+    }
+
+    public function update(int $id, array $data)
+    {
+        if ($this->handlePayment($id)) {
+            $this->paymentRepository->update($id, $data);
+        }
+    }
+
+    public function handlePayment(int $paymentId)
+    {
+        $payment = $this->getById($paymentId);
+        // set code
+        return true;
+    }
+
+    /**
+     * @param int $accountId
+     * @return Account|Builder
+     */
+    public function getClientIdByAccountId(int $accountId)
+    {
+        return $this->accountService->getById($accountId);
+    }
+}

@@ -22,7 +22,13 @@ class Account extends Model
 
     protected $table = 'accounts';
 
-    protected $fillable = ['client_id', 'iban'];
+    protected $fillable = [
+        'client_id',
+        'account_name',
+        'iban',
+        'amount',
+        'currency'
+    ];
 
     /**
      * @return BelongsTo

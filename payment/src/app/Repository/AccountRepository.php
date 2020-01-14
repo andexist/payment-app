@@ -32,11 +32,32 @@ class AccountRepository implements RepositoryInterface
     }
 
     /**
+     * @param int $clientId
+     * @return array
+     */
+    public function getByClientId(int $clientId)
+    {
+        return Account::query()
+            ->where('client_id', $clientId)
+            ->pluck('id')->toArray();
+    }
+
+    /**
      * @param array $data
+     * @return Builder|Account
      */
     public function create(array $data)
     {
         Account::query()->create($data);
+
+        return Account::query()->latest()->first([
+            'client_id',
+            'account_name',
+            'iban',
+            'amount',
+            'currency',
+            'created_at',
+        ]);
     }
 
     public function update(int $id, array $data)

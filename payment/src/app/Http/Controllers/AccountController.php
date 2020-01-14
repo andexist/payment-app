@@ -7,8 +7,9 @@ use App\Http\Controllers\Requests\CreateAccountRequest;
 use App\Services\AccountService\AccountService;
 use App\Services\ClientService\ClientService;
 use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
 use Exception;
+use App\Account;
 
 /**
  * Class AccountController
@@ -93,9 +94,9 @@ class AccountController extends Controller
                 ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        // create new client
-        $this->accountService->create($decodedContent);
+        /** @var  $newAccount */
+        $newAccount = $this->accountService->create($decodedContent);
 
-        return response()->json()->setStatusCode(Response::HTTP_OK);
+        return response()->json($newAccount)->setStatusCode(Response::HTTP_OK);
     }
 }
