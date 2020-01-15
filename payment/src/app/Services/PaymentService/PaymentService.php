@@ -47,7 +47,8 @@ class PaymentService
         PaymentRepository $paymentRepository,
         PaymentHelper $paymentHelper,
         AccountService $accountService
-    ) {
+    )
+    {
         $this->paymentRepository = $paymentRepository;
         $this->paymentHelper = $paymentHelper;
         $this->accountService = $accountService;
@@ -74,7 +75,7 @@ class PaymentService
      * @param int $clientId
      * @return array
      */
-    public function getClientAccountsIds(int $clientId)
+    private function getClientAccountsIds(int $clientId)
     {
         return $this->accountService->getByClientId($clientId);
     }
@@ -88,6 +89,18 @@ class PaymentService
         return $this->paymentRepository->getClientPaymentsPerLastHour(
             $this->getClientAccountsIds($clientId)
         );
+    }
+
+    /**
+     * @param int $clientId
+     * @return Collection
+     */
+    public function getPaymentsByClientId(int $clientId)
+    {
+        /** @var array $accountIds */
+        $accountIds = $this->getClientAccountsIds($clientId);
+
+        return $this->paymentRepository->getByAccountsIds($accountIds);
     }
 
     /**
@@ -115,20 +128,6 @@ class PaymentService
         return $this->paymentRepository->create($preparedData);
     }
 
-    public function update(int $id, array $data)
-    {
-        if ($this->handlePayment($id)) {
-            $this->paymentRepository->update($id, $data);
-        }
-    }
-
-    public function handlePayment(int $paymentId)
-    {
-        $payment = $this->getById($paymentId);
-        // set code
-        return true;
-    }
-
     /**
      * @param int $accountId
      * @return Account|Builder
@@ -136,5 +135,10 @@ class PaymentService
     public function getClientIdByAccountId(int $accountId)
     {
         return $this->accountService->getById($accountId);
+    }
+
+    public function confirmClientPayments(Collection $clientPayments)
+    {
+        return $this->paymentRepository->confirmClientPayments($clientPayments);
     }
 }

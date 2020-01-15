@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Payment
@@ -45,4 +46,12 @@ class Payment extends Model
         'details',
         'status',
     ];
+
+    /**
+     * @return BelongsTo
+     */
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
+    }
 }

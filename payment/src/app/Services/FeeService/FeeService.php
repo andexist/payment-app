@@ -15,12 +15,11 @@ class FeeService
      */
     public function calculateFee(float $amount, float $totalPaymentsAmount)
     {
-        if ($totalPaymentsAmount > 100.01) {
+        if ($totalPaymentsAmount > 100.00) {
             $fee = ($amount * 5) / 100;
         } else if ($totalPaymentsAmount === 0.00 && $amount > 100.00) {
             $fee = ($amount * 5) / 100;
         } else {
-            dd("10");
             $fee = ($amount * 10) / 100;
         }
 

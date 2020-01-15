@@ -19,8 +19,6 @@ class CreateAuthorizationTable extends Migration
         Schema::create('authorization', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('client_id')->index()->nullable();
-            $table->integer('account_id')->index()->nullable();
-            $table->integer('payment_id')->index()->nullable();
             $table->string('code')->nullable();
             $table->timestamps();
         });

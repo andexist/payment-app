@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Account;
 use App\Exceptions\ApiException;
 use App\Http\Controllers\Requests\CreatePaymentRequest;
+use App\Http\Controllers\Requests\ProcessPaymentRequest;
 use App\Payment;
 use App\Services\ClientService\ClientService;
 use App\Services\PaymentService\PaymentService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Str;
 
 /**
  * Class PaymentController
@@ -81,6 +82,34 @@ class PaymentController extends Controller
         $newPayment = $this->paymentService->create($decodedContent, $totalPaymentsAmount, $provider);
 
         return response()->json($newPayment)->setStatusCode(Response::HTTP_OK);
+    }
+
+    /**
+     * @param ProcessPaymentRequest $request
+     * @return JsonResponse
+     */
+    public function processPayments(ProcessPaymentRequest $request)
+    {
+        /** @var string $content */
+        $content = $request->getContent();
+        /** @var array $decodedContent */
+        $decodedContent = json_decode($content, true);
+
+        if ($decodedContent === null) {
+            return response()->json(['message' => ClientService::CONTENT_RESPONSE_ERROR])
+                ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        /** @var Collection $clientPayments */
+        $clientPayments = $this->paymentService->getPaymentsByClientId($decodedContent['clientId']);
+
+        if ($clientPayments->isEmpty()) {
+            return response()->json()->setStatusCode(Response::HTTP_NO_CONTENT);
+        }
+
+        $confirmedPayments = $this->paymentService->confirmClientPayments($clientPayments);
+
+        return response()->json($confirmedPayments)->setStatusCode(Response::HTTP_OK);
     }
 
 }

@@ -5,10 +5,20 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use DateTime;
 
 /**
  * Class Account
  * @package App
+ * @property int $id
+ * @property int $client_id
+ * @property string $account_name
+ * @property string $iban
+ * @property float $balance
+ * @property string $currency
+ * @property DateTime $created_at
+ * @property DateTime $updated_at
  */
 class Account extends Model
 {
@@ -26,7 +36,7 @@ class Account extends Model
         'client_id',
         'account_name',
         'iban',
-        'amount',
+        'balance',
         'currency'
     ];
 
@@ -44,5 +54,13 @@ class Account extends Model
     public function balance()
     {
         return $this->hasOne(Balance::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 }
