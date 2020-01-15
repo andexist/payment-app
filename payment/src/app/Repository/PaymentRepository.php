@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Account;
 use App\Payment;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -39,6 +38,18 @@ class PaymentRepository implements RepositoryInterface
     {
         return Payment::query()
             ->where('account_id', $accountId)
+            ->get();
+    }
+
+    /**
+     * @param array $accountsIds
+     * @return Collection
+     */
+    public function getByAccountsIds(array $accountsIds)
+    {
+        return Payment::query()
+            ->whereIn('account_id', $accountsIds)
+            ->where('status', Payment::STATUS_WAITING)
             ->get();
     }
 
@@ -109,10 +120,25 @@ class PaymentRepository implements RepositoryInterface
         ]);
     }
 
+
     public function update(int $id, array $data)
     {
-        $payment = Payment::query()->findOrFail($id);
+        // TODO: Implement update() method.
+    }
 
-        $payment->update($data);
+    public function confirmClientPayments(Collection $clientPayments)
+    {
+        $approvedPayments = [];
+
+        foreach ($clientPayments as $clientPayment) {
+            $payment = $this->getById($clientPayment->id);
+            $payment->status = Payment::STATUS_APPROVED;
+            $payment->save();
+            $approvedPayments[] = $payment->id;
+        }
+
+        return Payment::query()
+            ->whereIn('id', $approvedPayments)
+            ->get();
     }
 }

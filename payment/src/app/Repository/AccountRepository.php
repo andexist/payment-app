@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Collection;
  */
 class AccountRepository implements RepositoryInterface
 {
-
     /**
      * @param int $id
      * @return Builder|Account
@@ -54,7 +53,7 @@ class AccountRepository implements RepositoryInterface
             'client_id',
             'account_name',
             'iban',
-            'amount',
+            'balance',
             'currency',
             'created_at',
         ]);
