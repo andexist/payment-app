@@ -18,6 +18,9 @@ class PaymentService
 {
     const MAX_PAYMENT_PER_HOUR = 10;
     const MAX_PAYMENT_PER_HOUR_ERROR = 'Maximum 10 payments per hour.';
+    const MAX_TOTAL_AMOUNT = 1000;
+    const MAX_TOTAL_AMOUNT_MESSAGE = 'You have reached maximum payments amount';
+    const ALMOST_REACHED_LIMIT = 'Payment amount is to big. Your limit is ';
 
     /**
      * @var PaymentRepository
@@ -100,14 +103,14 @@ class PaymentService
 
     /**
      * @param array $data
-     * @return Builder|Payment
+     * @param float $totalPaymentsAmount
+     * @param string $provider
+     * @return Payment|Builder
      */
-    public function create(array $data)
+    public function create(array $data, float $totalPaymentsAmount, string $provider)
     {
-        /** @var float $totalAmount */
-        $totalAmount = $this->getPaymentsAmountCount($data['accountId']);
         /** @var array $preparedData */
-        $preparedData = $this->paymentHelper->prepareData($data, $totalAmount);
+        $preparedData = $this->paymentHelper->prepareData($data, $totalPaymentsAmount, $provider);
 
         return $this->paymentRepository->create($preparedData);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Requests;
 
+use App\Payment;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -18,6 +19,7 @@ class CreatePaymentRequest extends FormRequest
     public function rules()
     {
         return [
+            'paymentProvider' => 'required|in:' . implode(",", Payment::PAYMENT_PROVIDER),
             'accountId' => 'required|exists:accounts,id',
             'amount' => 'required',
             'receiverAccount' => 'required',

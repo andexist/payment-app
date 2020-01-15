@@ -9,9 +9,8 @@ use App\Payment;
 use App\Services\ClientService\ClientService;
 use App\Services\PaymentService\PaymentService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Str;
 
 /**
  * Class PaymentController
@@ -32,7 +31,6 @@ class PaymentController extends Controller
     {
         $this->paymentService = $paymentService;
     }
-
 
     /**
      * @param CreatePaymentRequest $request
@@ -55,17 +53,32 @@ class PaymentController extends Controller
         $account = $this->paymentService->getClientIdByAccountId($decodedContent['accountId']);
         /** @var int $clientId */
         $clientId = $account->client()->first()->client_id;
-
         /** @var int $paymentsCount */
         $paymentsCount = $this->paymentService->getClientPaymentsPerLastHour($clientId);
+        /** @var float $totalPaymentsAmount */
+        $totalPaymentsAmount = $this->paymentService->getPaymentsAmountCount($clientId);
+        /** @var float $limitLeft */
+        $limitLeft = PaymentService::MAX_TOTAL_AMOUNT - $totalPaymentsAmount;
+        /** @var string $provider */
+        $provider = strtoupper($decodedContent['paymentProvider']);
 
-        $this->paymentService->getPaymentsAmountCount($clientId);
+        // limit almost reached
+        if ($totalPaymentsAmount + $decodedContent['amount'] > PaymentService::MAX_TOTAL_AMOUNT) {
+            throw new ApiException(PaymentService::ALMOST_REACHED_LIMIT . $limitLeft);
+        }
 
+        // limit reached
+        if ($totalPaymentsAmount > PaymentService::MAX_TOTAL_AMOUNT) {
+            throw new ApiException(PaymentService::MAX_TOTAL_AMOUNT_MESSAGE);
+        }
+
+        // reached hourly payments limit
         if ($paymentsCount >= PaymentService::MAX_PAYMENT_PER_HOUR) {
             throw new ApiException(PaymentService::MAX_PAYMENT_PER_HOUR_ERROR);
         }
+
         /** @var Payment $newPayment */
-        $newPayment = $this->paymentService->create($decodedContent);
+        $newPayment = $this->paymentService->create($decodedContent, $totalPaymentsAmount, $provider);
 
         return response()->json($newPayment)->setStatusCode(Response::HTTP_OK);
     }
