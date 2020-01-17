@@ -74,6 +74,23 @@ class ClientController extends Controller
     }
 
     /**
+     * @param int $clientId
+     * @return JsonResponse
+     * @throws ApiException
+     */
+    public function getClientPayments(int $clientId)
+    {
+        try {
+            /** @var array $clientPayments */
+            $clientPayments = $this->clientService->getClientPayments($clientId);
+        } catch (Exception $exception) {
+            throw new ApiException($exception->getMessage());
+        }
+
+        return response()->json($clientPayments)->setStatusCode(Response::HTTP_OK);
+    }
+
+    /**
      * @param CreateClientRequest $request
      * @return JsonResponse
      * @throws ApiException

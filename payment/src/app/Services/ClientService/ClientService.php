@@ -2,6 +2,7 @@
 
 namespace App\Services\ClientService;
 
+use App\Account;
 use App\Client;
 use App\Repository\ClientRepository;
 use App\Services\ClientService\Utils\ClientHelper;
@@ -78,5 +79,23 @@ class ClientService
         $client = $this->getById($clientId);
 
         return $client->accounts()->get();
+    }
+
+    /**
+     * @param int $clientId
+     * @return array
+     */
+    public function getClientPayments(int $clientId)
+    {
+        /** @var Collection $clientAccounts */
+        $clientAccounts = $this->getClientAccount($clientId);
+
+        $payments = [];
+
+        foreach ($clientAccounts as $account) {
+            $payments[] = $account->payments()->get();
+        }
+
+        return $payments;
     }
 }

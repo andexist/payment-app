@@ -21,6 +21,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::prefix('clients')->group(function () {
     Route::get('/', 'ClientController@getClients');
     Route::get('/{id}', 'ClientController@getClient');
+    Route::get('/{clientId}/payments', 'ClientController@getClientPayments');
     Route::get('{clientId}/accounts', 'ClientController@getClientAccounts');
     Route::post('/create', 'ClientController@createClient');
 });

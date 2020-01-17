@@ -28,7 +28,6 @@ class Account extends Model
         'gbp' => 'GBP',
     ];
 
-
     protected $table = 'accounts';
 
     protected $fillable = [
