@@ -31,29 +31,6 @@ class PaymentRepository implements RepositoryInterface
     }
 
     /**
-     * @param int $accountId
-     * @return Builder[]|Collection
-     */
-    public function getByAccountId(int $accountId)
-    {
-        return Payment::query()
-            ->where('account_id', $accountId)
-            ->get();
-    }
-
-    /**
-     * @param array $accountsIds
-     * @return Collection
-     */
-    public function getByAccountsIds(array $accountsIds)
-    {
-        return Payment::query()
-            ->whereIn('account_id', $accountsIds)
-            ->where('status', Payment::STATUS_WAITING)
-            ->get();
-    }
-
-    /**
      * @param array $accountsIds
      * @return int
      */
@@ -103,21 +80,22 @@ class PaymentRepository implements RepositoryInterface
 
     /**
      * @param array $data
-     * @return Builder|Payment
+     * @return array
      */
     public function create(array $data)
     {
-        Payment::query()->create($data);
+        /** @var Payment $payment */
+        $payment = Payment::query()->create($data);
 
-        return Payment::query()->latest()->first([
-            'id',
-            'account_id',
-            'details',
-            'receiver_account',
-            'receiver_name',
-            'amount',
-            'currency',
-        ]);
+        return [
+            'client_id' => $payment->account()->first()->client_id,
+            'account_id' => $payment->account_id,
+            'details' => $payment->details,
+            'receiver_account' => $payment->receiver_account,
+            'receiver_name' => $payment->receiver_name,
+            'amount' => $payment->amount,
+            'currency' => $payment->currency,
+        ];
     }
 
 
@@ -126,6 +104,22 @@ class PaymentRepository implements RepositoryInterface
         // TODO: Implement update() method.
     }
 
+    /**
+     * @param array $accountsIds
+     * @return Collection
+     */
+    public function getWaitingPaymentsByAccountsIds(array $accountsIds)
+    {
+        return Payment::query()
+            ->whereIn('account_id', $accountsIds)
+            ->where('status', Payment::STATUS_WAITING)
+            ->get();
+    }
+
+    /**
+     * @param Collection $clientPayments
+     * @return Builder[]|Collection
+     */
     public function confirmClientPayments(Collection $clientPayments)
     {
         $approvedPayments = [];
@@ -140,5 +134,50 @@ class PaymentRepository implements RepositoryInterface
         return Payment::query()
             ->whereIn('id', $approvedPayments)
             ->get();
+    }
+
+    /**
+     * @param array $clientAccountsIds
+     * @return Collection
+     */
+    public function getConfirmedClientPayment(array $clientAccountsIds)
+    {
+        return Payment::query()
+            ->whereIn('account_id', $clientAccountsIds)
+            ->where('status', Payment::STATUS_APPROVED)
+            ->get();
+    }
+
+    /**
+     * @param array $paymentsIds
+     * @return array
+     */
+    public function processClientPayments(array $paymentsIds)
+    {
+        Payment::query()->whereIn('id', $paymentsIds)
+            ->update([
+            'status' => Payment::STATUS_COMPLETED
+        ]);
+
+        /** @var Payment $payments */
+        $payments = Payment::query()
+            ->whereIn('id', $paymentsIds)
+            ->get();
+
+       $paymentsArray = [];
+
+       foreach ($payments as $payment) {
+           $paymentsArray[] = [
+               'payment_id' => $payment->id,
+               'details' => $payment->details,
+               'receiver_account' => $payment->receiver_account,
+               'receiver_name' => $payment->receiver_name,
+               'amount' => $payment->amount,
+               'fee' => $payment->fee,
+               'status' => $payment->status,
+           ];
+       }
+
+       return $paymentsArray;
     }
 }

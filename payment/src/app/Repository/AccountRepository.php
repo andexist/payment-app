@@ -43,20 +43,20 @@ class AccountRepository implements RepositoryInterface
 
     /**
      * @param array $data
-     * @return Builder|Account
+     * @return array
      */
     public function create(array $data)
     {
-        Account::query()->create($data);
+        /** @var Account $account */
+        $account = Account::query()->create($data);
 
-        return Account::query()->latest()->first([
-            'client_id',
-            'account_name',
-            'iban',
-            'balance',
-            'currency',
-            'created_at',
-        ]);
+        return [
+            'client_id' => $account->client_id,
+            'account_name' => $account->account_name,
+            'iban' => $account->iban,
+            'balance' => $account->balance,
+            'currency' => $account->currency,
+        ];
     }
 
     public function update(int $id, array $data)

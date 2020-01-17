@@ -4,7 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use DateTime;
 
@@ -37,7 +36,7 @@ class Account extends Model
         'account_name',
         'iban',
         'balance',
-        'currency'
+        'currency',
     ];
 
     /**
@@ -45,15 +44,7 @@ class Account extends Model
      */
     public function client()
     {
-        return $this->belongsTo(Account::class);
-    }
-
-    /**
-     * @return HasOne
-     */
-    public function balance()
-    {
-        return $this->hasOne(Balance::class);
+        return $this->belongsTo(Client::class);
     }
 
     /**

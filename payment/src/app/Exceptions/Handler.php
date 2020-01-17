@@ -3,9 +3,9 @@
 namespace App\Exceptions;
 
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Response as HTTPResponse;
 use Illuminate\Http\Request;
@@ -52,6 +52,9 @@ class Handler extends ExceptionHandler
             return response()->json(["message" => $exception->errors()] )
                 ->setStatusCode(HTTPResponse::HTTP_BAD_REQUEST);
         } else if ($exception instanceof ApiException) {
+            return response()->json(["message" => $exception->getMessage()] )
+                ->setStatusCode($exception->getCode());
+        } else if ($exception instanceof FatalThrowableError) {
             return response()->json(["message" => $exception->getMessage()] )
                 ->setStatusCode($exception->getCode());
         }

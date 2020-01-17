@@ -29,12 +29,12 @@ Route::prefix('clients')->group(function () {
 Route::prefix('accounts')->group(function () {
     Route::get('/', 'AccountController@getAccounts');
     Route::get('/{id}', 'AccountController@getAccount');
-    Route::get('{accountId}/balance', 'AccountController@getAccountBalance');
+    Route::get('/{accountId}/payments', 'AccountController@getAccountPayments');
     Route::post('/create', 'AccountController@createAccount');
 });
 
 // payments routes
 Route::prefix('payments')->group(function () {
     Route::post('/create', 'PaymentController@createPayment');
-    Route::post('/process', 'PaymentController@processPayments');
+    Route::post('/approve', 'PaymentController@approvePayments');
 });

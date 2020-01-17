@@ -7,9 +7,6 @@ use App\Repository\AccountRepository;
 use App\Services\AccountService\Utils\AccountHelper;
 use Illuminate\Database\Eloquent\Collection;
 use App\Account;
-use Illuminate\Database\Eloquent\Builder;
-use Exception;
-use Illuminate\Http\Response;
 
 /**
  * Class AccountService
@@ -41,6 +38,18 @@ class AccountService
     }
 
     /**
+     * @param array $data
+     * @return array
+     */
+    public function create(array $data)
+    {
+        /** @var array $preparedData */
+        $preparedData = $this->accountHelper->prepareData($data);
+
+        return $this->accountRepository->create($preparedData);
+    }
+
+    /**
      * @return Collection
      */
     public function getAll()
@@ -50,23 +59,11 @@ class AccountService
 
     /**
      * @param int $id
-     * @return Account|Builder
+     * @return Account
      */
     public function getById(int $id)
     {
         return $this->accountRepository->getById($id);
-    }
-
-    /**
-     * @param $accountId
-     * @return Collection
-     */
-    public function getAccountBalance($accountId)
-    {
-        /** @var Account $account */
-        $account = $this->getById($accountId);
-
-        return $account->balance()->get();
     }
 
     /**
@@ -79,15 +76,14 @@ class AccountService
     }
 
     /**
-     * @param array $data
-     * @return Account|Builder
+     * @param int $accountId
+     * @return Collection
      */
-    public function create(array $data)
+    public function getAccountPayments(int $accountId)
     {
-        /** @var array $preparedData */
-        $preparedData = $this->accountHelper->prepareData($data);
+        /** @var Account $account */
+        $account = $this->getById($accountId);
 
-        // create
-        return $this->accountRepository->create($preparedData);
+        return $account->payments()->get();
     }
 }

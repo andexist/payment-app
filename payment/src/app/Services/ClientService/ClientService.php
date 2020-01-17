@@ -39,6 +39,17 @@ class ClientService
         $this->clientHelper = $clientHelper;
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function create(array $data)
+    {
+        /** @var array $preparedData */
+        $preparedData = $this->clientHelper->prepareData($data);
+        // create
+        return $this->clientRepository->create($preparedData);
+    }
 
     /**
      * @return Collection
@@ -55,14 +66,6 @@ class ClientService
     public function getById(int $id)
     {
         return $this->clientRepository->getById($id);
-    }
-
-    public function create(array $data)
-    {
-        /** @var array $preparedData */
-        $preparedData = $this->clientHelper->prepareData($data);
-        // create
-        return $this->clientRepository->create($preparedData);
     }
 
     /**

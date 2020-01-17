@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * Class Payment
  * @package App
+ * @property int $id
  * @property int $account_id
  * @property float $fee
  * @property float $amount

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use DateTime;
 
 /**
  * Class Client
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $username
  * @property string $first_name
  * @property string $last_name
+ * @property DateTime $created_at
  */
 class Client extends Model
 {

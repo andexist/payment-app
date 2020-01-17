@@ -33,11 +33,11 @@ class ClientController extends Controller
     {
         try {
             $clients = $this->clientService->getAll();
-
-            return response()->json($clients)->setStatusCode(Response::HTTP_OK);
         } catch (Exception $exception) {
             throw new ApiException($exception->getMessage());
         }
+
+        return response()->json($clients)->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -50,10 +50,11 @@ class ClientController extends Controller
         try {
             $client = $this->clientService->getById($id);
 
-            return response()->json($client)->setStatusCode(Response::HTTP_OK);
         } catch (Exception $exception) {
             throw new ApiException($exception->getMessage());
         }
+
+        return response()->json($client)->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -65,16 +66,17 @@ class ClientController extends Controller
     {
         try {
             $clientAccounts = $this->clientService->getClientAccount($clientId);
-
-            return response()->json($clientAccounts)->setStatusCode(Response::HTTP_OK);
         } catch (Exception $exception) {
             throw new ApiException($exception->getMessage());
         }
+
+        return response()->json($clientAccounts)->setStatusCode(Response::HTTP_OK);
     }
 
     /**
      * @param CreateClientRequest $request
      * @return JsonResponse
+     * @throws ApiException
      */
     public function createClient(CreateClientRequest $request)
     {
@@ -88,8 +90,12 @@ class ClientController extends Controller
                 ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        // create new client
-        $newClient = $this->clientService->create($decodedContent);
+        try {
+            /** @var array $newClient */
+            $newClient = $this->clientService->create($decodedContent);
+        } catch (Exception $exception) {
+            throw new ApiException($exception->getMessage());
+        }
 
         return response()->json($newClient)->setStatusCode(Response::HTTP_OK);
     }

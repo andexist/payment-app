@@ -6,8 +6,6 @@ use App\Account;
 use App\Repository\PaymentRepository;
 use App\Services\AccountService\AccountService;
 use App\Services\PaymentService\Utils\PaymentHelper;
-use Illuminate\Database\Eloquent\Builder;
-use App\Payment;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -47,37 +45,23 @@ class PaymentService
         PaymentRepository $paymentRepository,
         PaymentHelper $paymentHelper,
         AccountService $accountService
-    )
-    {
+    ) {
         $this->paymentRepository = $paymentRepository;
         $this->paymentHelper = $paymentHelper;
         $this->accountService = $accountService;
     }
 
     /**
-     * @return Collection
-     */
-    public function getAll()
-    {
-        return $this->paymentRepository->getAll();
-    }
-
-    /**
-     * @param int $id
-     * @return Payment|Builder
-     */
-    public function getById(int $id)
-    {
-        return $this->paymentRepository->getById($id);
-    }
-
-    /**
-     * @param int $clientId
+     * @param array $data
+     * @param float $totalPaymentsAmount
      * @return array
      */
-    private function getClientAccountsIds(int $clientId)
+    public function create(array $data, float $totalPaymentsAmount)
     {
-        return $this->accountService->getByClientId($clientId);
+        /** @var array $preparedData */
+        $preparedData = $this->paymentHelper->prepareData($data, $totalPaymentsAmount);
+
+        return $this->paymentRepository->create($preparedData);
     }
 
     /**
@@ -93,18 +77,6 @@ class PaymentService
 
     /**
      * @param int $clientId
-     * @return Collection
-     */
-    public function getPaymentsByClientId(int $clientId)
-    {
-        /** @var array $accountIds */
-        $accountIds = $this->getClientAccountsIds($clientId);
-
-        return $this->paymentRepository->getByAccountsIds($accountIds);
-    }
-
-    /**
-     * @param int $clientId
      * @return float
      */
     public function getPaymentsAmountCount(int $clientId)
@@ -115,30 +87,62 @@ class PaymentService
     }
 
     /**
-     * @param array $data
-     * @param float $totalPaymentsAmount
-     * @param string $provider
-     * @return Payment|Builder
+     * @param int $clientId
+     * @return Collection
      */
-    public function create(array $data, float $totalPaymentsAmount, string $provider)
+    public function getWaitingPaymentsByClientId(int $clientId)
     {
-        /** @var array $preparedData */
-        $preparedData = $this->paymentHelper->prepareData($data, $totalPaymentsAmount, $provider);
+        /** @var array $accountIds */
+        $accountIds = $this->getClientAccountsIds($clientId);
 
-        return $this->paymentRepository->create($preparedData);
+        return $this->paymentRepository->getWaitingPaymentsByAccountsIds($accountIds);
+    }
+
+    /**
+     * @param Collection $clientPayments
+     * @return Collection
+     */
+    public function confirmClientPayments(Collection $clientPayments)
+    {
+        return $this->paymentRepository->confirmClientPayments($clientPayments);
+    }
+
+    /**
+     * @param int $clientId
+     * @return Collection
+     */
+    public function getConfirmedClientPayment(int $clientId)
+    {
+        /** @var array $clientAccountsIds */
+        $clientAccountsIds = $this->getClientAccountsIds($clientId);
+
+        return $this->paymentRepository->getConfirmedClientPayment($clientAccountsIds);
+    }
+
+    /**
+     * @param array $paymentsIds
+     * @return array
+     */
+    public function processClientPayments(array $paymentsIds)
+    {
+        return $this->paymentRepository->processClientPayments($paymentsIds);
     }
 
     /**
      * @param int $accountId
-     * @return Account|Builder
+     * @return Account
      */
     public function getClientIdByAccountId(int $accountId)
     {
         return $this->accountService->getById($accountId);
     }
 
-    public function confirmClientPayments(Collection $clientPayments)
+    /**
+     * @param int $clientId
+     * @return array
+     */
+    private function getClientAccountsIds(int $clientId)
     {
-        return $this->paymentRepository->confirmClientPayments($clientPayments);
+        return $this->accountService->getByClientId($clientId);
     }
 }

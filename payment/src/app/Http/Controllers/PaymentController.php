@@ -6,12 +6,12 @@ use App\Account;
 use App\Exceptions\ApiException;
 use App\Http\Controllers\Requests\CreatePaymentRequest;
 use App\Http\Controllers\Requests\ProcessPaymentRequest;
-use App\Payment;
 use App\Services\ClientService\ClientService;
 use App\Services\PaymentService\PaymentService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Exception;
 
 /**
  * Class PaymentController
@@ -52,16 +52,12 @@ class PaymentController extends Controller
 
         /** @var Account $account */
         $account = $this->paymentService->getClientIdByAccountId($decodedContent['accountId']);
-        /** @var int $clientId */
-        $clientId = $account->client()->first()->client_id;
         /** @var int $paymentsCount */
-        $paymentsCount = $this->paymentService->getClientPaymentsPerLastHour($clientId);
+        $paymentsCount = $this->paymentService->getClientPaymentsPerLastHour($account->client_id);
         /** @var float $totalPaymentsAmount */
-        $totalPaymentsAmount = $this->paymentService->getPaymentsAmountCount($clientId);
+        $totalPaymentsAmount = $this->paymentService->getPaymentsAmountCount($account->client_id);
         /** @var float $limitLeft */
         $limitLeft = PaymentService::MAX_TOTAL_AMOUNT - $totalPaymentsAmount;
-        /** @var string $provider */
-        $provider = strtoupper($decodedContent['paymentProvider']);
 
         // limit almost reached
         if ($totalPaymentsAmount + $decodedContent['amount'] > PaymentService::MAX_TOTAL_AMOUNT) {
@@ -78,8 +74,12 @@ class PaymentController extends Controller
             throw new ApiException(PaymentService::MAX_PAYMENT_PER_HOUR_ERROR);
         }
 
-        /** @var Payment $newPayment */
-        $newPayment = $this->paymentService->create($decodedContent, $totalPaymentsAmount, $provider);
+        try {
+            /** @var array $newPayment */
+            $newPayment = $this->paymentService->create($decodedContent, $totalPaymentsAmount);
+        } catch (Exception $exception) {
+            throw new ApiException($exception->getMessage());
+        }
 
         return response()->json($newPayment)->setStatusCode(Response::HTTP_OK);
     }
@@ -87,8 +87,9 @@ class PaymentController extends Controller
     /**
      * @param ProcessPaymentRequest $request
      * @return JsonResponse
+     * @throws ApiException
      */
-    public function processPayments(ProcessPaymentRequest $request)
+    public function approvePayments(ProcessPaymentRequest $request)
     {
         /** @var string $content */
         $content = $request->getContent();
@@ -100,16 +101,19 @@ class PaymentController extends Controller
                 ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        /** @var Collection $clientPayments */
-        $clientPayments = $this->paymentService->getPaymentsByClientId($decodedContent['clientId']);
+        /** @var Collection $waitingPayments */
+        $waitingPayments = $this->paymentService->getWaitingPaymentsByClientId($decodedContent['clientId']);
 
-        if ($clientPayments->isEmpty()) {
+        if ($waitingPayments->isEmpty()) {
             return response()->json()->setStatusCode(Response::HTTP_NO_CONTENT);
         }
 
-        $confirmedPayments = $this->paymentService->confirmClientPayments($clientPayments);
+        try {
+            $confirmedPayments = $this->paymentService->confirmClientPayments($waitingPayments);
+        } catch (Exception $exception) {
+            throw  new ApiException($exception->getMessage());
+        }
 
         return response()->json($confirmedPayments)->setStatusCode(Response::HTTP_OK);
     }
-
 }

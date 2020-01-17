@@ -17,8 +17,8 @@ class AccountHelper
     {
         return [
             'client_id' => $data['clientId'],
-            'account_name' => $data['accountName'],
-            'iban' => $data['iban'],
+            'account_name' => trim($data['accountName']),
+            'iban' => trim($data['iban']),
             'balance' => $data['amount'],
             'currency' => $data['currency'],
         ];

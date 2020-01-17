@@ -3,7 +3,9 @@
 namespace App\Services\PaymentService\Utils;
 
 use App\Account;
+use App\Client;
 use App\Payment;
+use App\Services\AccountService\AccountService;
 use App\Services\FeeService\FeeService;
 use App\Services\PaymentService\PaymentProviders\MegacashProvider;
 use App\Services\PaymentService\PaymentProviders\SupermoneyProvider;
@@ -30,33 +32,44 @@ class PaymentHelper
     private $supermoneyProvider;
 
     /**
+     * @var AccountService
+     */
+    private $accountService;
+
+    /**
      * PaymentHelper constructor.
      * @param FeeService $feeService
      * @param MegacashProvider $megacashProvider
      * @param SupermoneyProvider $supermoneyProvider
+     * @param AccountService $accountService
      */
     public function __construct(
         FeeService $feeService,
         MegacashProvider $megacashProvider,
-        SupermoneyProvider $supermoneyProvider
+        SupermoneyProvider $supermoneyProvider,
+        AccountService $accountService
     ) {
         $this->feeService = $feeService;
         $this->megacashProvider = $megacashProvider;
         $this->supermoneyProvider = $supermoneyProvider;
+        $this->accountService = $accountService;
     }
 
     /**
      * @param array $data
      * @param float $totalAmount
-     * @param string $provider
      * @return array
      */
-    public function prepareData(array $data, float $totalAmount, string $provider)
+    public function prepareData(array $data, float $totalAmount)
     {
         /** @var float $fee */
         $fee = $this->feeService->calculateFee($data['amount'], $totalAmount);
         /** @var string $details */
-        $details = $this->processPayment($data, $provider);
+        $details = $this->processPayment($data);
+        /** @var Account $payerDetails */
+        $payerDetails = $this->getPayerDetails($data['accountId']);
+        /** @var Client $client */
+        $client = $payerDetails->client()->first();
 
         return [
             'account_id' => $data['accountId'],
@@ -64,8 +77,8 @@ class PaymentHelper
             'fee' => $fee,
             'amount' => $data['amount'],
             'currency' => Account::AVAILABLE_CURRENCIES['eur'],
-            'payer_account' => 'random data',
-            'payer_name' => "random data",
+            'payer_account' => $payerDetails->iban,
+            'payer_name' => $client->first_name . ' ' . $client->last_name,
             'receiver_account' => $data['receiverAccount'],
             'receiver_name' => $data['receiverName'],
             'details' => $details,
@@ -74,15 +87,23 @@ class PaymentHelper
     }
 
     /**
+     * @param int $accountId
+     * @return Account
+     */
+    private function getPayerDetails(int $accountId)
+    {
+        return $this->accountService->getById($accountId);
+    }
+
+    /**
      * @param array $data
-     * @param string $provider
      * @return string
      */
-    private function processPayment(array $data, string $provider)
+    private function processPayment(array $data)
     {
-        if ($provider === Payment::PAYMENT_PROVIDER['megacash']) {
+        if ($data['paymentProvider'] === Payment::PAYMENT_PROVIDER['megacash']) {
             return $this->megacashProvider->processPayment($data);
-        } else if ($provider === Payment::PAYMENT_PROVIDER['supermoney']) {
+        } else if ($data['paymentProvider'] === Payment::PAYMENT_PROVIDER['supermoney']) {
             return $this->supermoneyProvider->processPayment($data);
         }
     }

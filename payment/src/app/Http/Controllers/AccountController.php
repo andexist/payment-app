@@ -6,10 +6,10 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Requests\CreateAccountRequest;
 use App\Services\AccountService\AccountService;
 use App\Services\ClientService\ClientService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Exception;
-use App\Account;
 
 /**
  * Class AccountController
@@ -38,12 +38,13 @@ class AccountController extends Controller
     public function getAccounts()
     {
         try {
+            /** @var Collection $accounts */
             $accounts = $this->accountService->getAll();
-
-            return response()->json($accounts)->setStatusCode(Response::HTTP_OK);
         } catch (Exception $exception) {
             throw new ApiException($exception->getMessage());
         }
+
+        return response()->json($accounts)->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -55,11 +56,11 @@ class AccountController extends Controller
     {
         try {
             $account = $this->accountService->getById($id);
-
-            return response()->json($account)->setStatusCode(Response::HTTP_OK);
         } catch (Exception $exception) {
             throw new ApiException($exception->getMessage());
         }
+
+        return response()->json($account)->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -67,20 +68,22 @@ class AccountController extends Controller
      * @return JsonResponse
      * @throws ApiException
      */
-    public function getAccountBalance(int $accountId)
+    public function getAccountPayments(int $accountId)
     {
         try {
-            $accountBalance = $this->accountService->getAccountBalance($accountId);
-
-            return response()->json($accountBalance)->setStatusCode(Response::HTTP_OK);
+            /** @var Collection $accountPayments */
+            $accountPayments = $this->accountService->getAccountPayments($accountId);
         } catch (Exception $exception) {
             throw new ApiException($exception->getMessage());
         }
+
+        return response()->json($accountPayments)->setStatusCode(Response::HTTP_OK);
     }
 
     /**
      * @param CreateAccountRequest $request
      * @return JsonResponse
+     * @throws ApiException
      */
     public function createAccount(CreateAccountRequest $request)
     {
@@ -94,8 +97,12 @@ class AccountController extends Controller
                 ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        /** @var  $newAccount */
-        $newAccount = $this->accountService->create($decodedContent);
+        try {
+            /** @var array $newAccount */
+            $newAccount = $this->accountService->create($decodedContent);
+        } catch (Exception $exception) {
+            throw new ApiException($exception->getMessage());
+        }
 
         return response()->json($newAccount)->setStatusCode(Response::HTTP_OK);
     }
