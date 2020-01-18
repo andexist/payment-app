@@ -52,7 +52,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-//        dd($exception);
         if ($exception instanceof ValidationException) {
             return response()->json(["message" => $exception->errors()])
                 ->setStatusCode(HTTPResponse::HTTP_BAD_REQUEST);

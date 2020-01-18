@@ -59,7 +59,7 @@ class PaymentController extends Controller
         /** @var float $limitLeft */
         $limitLeft = PaymentService::MAX_TOTAL_AMOUNT - $totalPaymentsAmount;
         /** @var Payment $lastPayment */
-        $unconfirmedPayment = $this->paymentService->getUnconfirmedPayment($decodedContent['accountId']);
+        $unconfirmedPayment = $this->paymentService->getUnconfirmedPayment($account->client_id);
 
         // confirm or reject last payment before creating new one
         if ($unconfirmedPayment) {

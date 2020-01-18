@@ -89,12 +89,15 @@ class PaymentService
     }
 
     /**
-     * @param int $accountId
+     * @param int $clientId
      * @return Payment|Builder
      */
-    public function getUnconfirmedPayment(int $accountId)
+    public function getUnconfirmedPayment(int $clientId)
     {
-        return $this->paymentRepository->getUnconfirmedPayment($accountId);
+        /** @var array $accountIds */
+        $accountIds = $this->getClientAccountsIds($clientId);
+
+        return $this->paymentRepository->getUnconfirmedPayment($accountIds);
     }
 
     /**

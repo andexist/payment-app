@@ -105,13 +105,13 @@ class PaymentRepository implements RepositoryInterface
     }
 
     /**
-     * @param int $accountId
+     * @param array $accountIds
      * @return Payment|Builder
      */
-    public function getUnconfirmedPayment(int $accountId)
+    public function getUnconfirmedPayment(array $accountIds)
     {
         return Payment::query()
-            ->where('account_id', $accountId)
+            ->whereIn('account_id', $accountIds)
             ->where('status', Payment::STATUS_WAITING)
             ->orderByDesc('id')
             ->limit(1)
