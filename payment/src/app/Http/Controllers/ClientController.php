@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
-use App\Http\Controllers\Requests\CreateClientRequest;
+use App\Http\Controllers\Requests\ClientRequest\CreateClientRequest;
 use App\Services\ClientService\ClientService;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * Class ClientController
+ * @package App\Http\Controllers
+ */
 class ClientController extends Controller
 {
     /**
@@ -74,6 +78,23 @@ class ClientController extends Controller
     }
 
     /**
+     * @param int $clientId
+     * @return JsonResponse
+     * @throws ApiException
+     */
+    public function getClientPayments(int $clientId)
+    {
+        try {
+            /** @var array $clientPayments */
+            $clientPayments = $this->clientService->getClientPayments($clientId);
+        } catch (Exception $exception) {
+            throw new ApiException($exception->getMessage());
+        }
+
+        return response()->json($clientPayments)->setStatusCode(Response::HTTP_OK);
+    }
+
+    /**
      * @param CreateClientRequest $request
      * @return JsonResponse
      * @throws ApiException
@@ -86,7 +107,7 @@ class ClientController extends Controller
         $decodedContent = json_decode($content, true);
 
         if ($decodedContent === null) {
-            return response()->json(['message' => ClientService::CONTENT_RESPONSE_ERROR])
+            return response()->json(['message' => ApiException::CONTENT_RESPONSE_ERROR])
                 ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

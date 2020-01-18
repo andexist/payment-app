@@ -15,9 +15,9 @@ class ClientHelper
     public function prepareData(array $data)
     {
         return [
-          'username' => trim($data['username']),
-          'first_name' => trim($data['firstName']),
-          'last_name' => trim($data['lastName']),
+            'username' => trim($data['username']),
+            'first_name' => trim($data['firstName']),
+            'last_name' => trim($data['lastName']),
         ];
     }
 }

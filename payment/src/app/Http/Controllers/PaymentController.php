@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Account;
 use App\Exceptions\ApiException;
-use App\Http\Controllers\Requests\CreatePaymentRequest;
-use App\Http\Controllers\Requests\ProcessPaymentRequest;
-use App\Services\ClientService\ClientService;
+use App\Http\Controllers\Requests\PaymentRequest\CreatePaymentRequest;
+use App\Http\Controllers\Requests\PaymentRequest\ProcessPaymentRequest;
+use App\Http\Controllers\Requests\PaymentRequest\RejectPaymentRequest;
+use App\Payment;
 use App\Services\PaymentService\PaymentService;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Exception;
@@ -46,7 +46,7 @@ class PaymentController extends Controller
         $decodedContent = json_decode($content, true);
 
         if ($decodedContent === null) {
-            return response()->json(['message' => ClientService::CONTENT_RESPONSE_ERROR])
+            return response()->json(['message' => ApiException::CONTENT_RESPONSE_ERROR])
                 ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -58,6 +58,13 @@ class PaymentController extends Controller
         $totalPaymentsAmount = $this->paymentService->getPaymentsAmountCount($account->client_id);
         /** @var float $limitLeft */
         $limitLeft = PaymentService::MAX_TOTAL_AMOUNT - $totalPaymentsAmount;
+        /** @var Payment $lastPayment */
+        $unconfirmedPayment = $this->paymentService->getUnconfirmedPayment($account->client_id);
+
+        // confirm or reject last payment before creating new one
+        if ($unconfirmedPayment) {
+            throw new ApiException(ApiException::UNCONFIRMED_PAYMENT_ERROR . $unconfirmedPayment->id);
+        }
 
         // limit almost reached
         if ($totalPaymentsAmount + $decodedContent['amount'] > PaymentService::MAX_TOTAL_AMOUNT) {
@@ -89,7 +96,7 @@ class PaymentController extends Controller
      * @return JsonResponse
      * @throws ApiException
      */
-    public function approvePayments(ProcessPaymentRequest $request)
+    public function approvePayment(ProcessPaymentRequest $request)
     {
         /** @var string $content */
         $content = $request->getContent();
@@ -97,23 +104,44 @@ class PaymentController extends Controller
         $decodedContent = json_decode($content, true);
 
         if ($decodedContent === null) {
-            return response()->json(['message' => ClientService::CONTENT_RESPONSE_ERROR])
+            return response()->json(['message' => ApiException::CONTENT_RESPONSE_ERROR])
                 ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        /** @var Collection $waitingPayments */
-        $waitingPayments = $this->paymentService->getWaitingPaymentsByClientId($decodedContent['clientId']);
-
-        if ($waitingPayments->isEmpty()) {
-            return response()->json()->setStatusCode(Response::HTTP_NO_CONTENT);
-        }
-
         try {
-            $confirmedPayments = $this->paymentService->confirmClientPayments($waitingPayments);
+            /** @var array $confirmedPayment */
+            $confirmedPayment = $this->paymentService->confirmPayment($decodedContent['paymentId']);
         } catch (Exception $exception) {
             throw  new ApiException($exception->getMessage());
         }
 
-        return response()->json($confirmedPayments)->setStatusCode(Response::HTTP_OK);
+        return response()->json($confirmedPayment)->setStatusCode(Response::HTTP_OK);
+    }
+
+    /**
+     * @param RejectPaymentRequest $request
+     * @return JsonResponse
+     * @throws ApiException
+     */
+    public function rejectPayment(RejectPaymentRequest $request)
+    {
+        /** @var string $content */
+        $content = $request->getContent();
+        /** @var array $decodedContent */
+        $decodedContent = json_decode($content, true);
+
+        if ($decodedContent === null) {
+            return response()->json(['message' => ApiException::CONTENT_RESPONSE_ERROR])
+                ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            /** @var array $rejectedPayment */
+            $rejectedPayment = $this->paymentService->rejectPayment($decodedContent['paymentId']);
+        } catch (Exception $exception) {
+            throw new ApiException($exception->getMessage());
+        }
+
+        return response()->json($rejectedPayment)->setStatusCode(Response::HTTP_OK);
     }
 }

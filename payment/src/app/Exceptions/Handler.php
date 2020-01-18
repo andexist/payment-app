@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\Response as HTTPResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * Class Handler
+ * @package App\Exceptions
+ */
 class Handler extends ExceptionHandler
 {
     /**
@@ -49,13 +53,13 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         if ($exception instanceof ValidationException) {
-            return response()->json(["message" => $exception->errors()] )
+            return response()->json(["message" => $exception->errors()])
                 ->setStatusCode(HTTPResponse::HTTP_BAD_REQUEST);
         } else if ($exception instanceof ApiException) {
-            return response()->json(["message" => $exception->getMessage()] )
+            return response()->json(["message" => $exception->getMessage()])
                 ->setStatusCode($exception->getCode());
         } else if ($exception instanceof FatalThrowableError) {
-            return response()->json(["message" => $exception->getMessage()] )
+            return response()->json(["message" => $exception->getMessage()])
                 ->setStatusCode($exception->getCode());
         }
     }

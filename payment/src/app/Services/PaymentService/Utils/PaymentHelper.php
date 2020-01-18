@@ -73,7 +73,6 @@ class PaymentHelper
 
         return [
             'account_id' => $data['accountId'],
-            'payment_provider' => $data['paymentProvider'],
             'fee' => $fee,
             'amount' => $data['amount'],
             'currency' => Account::AVAILABLE_CURRENCIES['eur'],
@@ -101,9 +100,9 @@ class PaymentHelper
      */
     private function processPayment(array $data)
     {
-        if ($data['paymentProvider'] === Payment::PAYMENT_PROVIDER['megacash']) {
+        if ($data['currency'] === Account::AVAILABLE_CURRENCIES['eur']) {
             return $this->megacashProvider->processPayment($data);
-        } else if ($data['paymentProvider'] === Payment::PAYMENT_PROVIDER['supermoney']) {
+        } else {
             return $this->supermoneyProvider->processPayment($data);
         }
     }

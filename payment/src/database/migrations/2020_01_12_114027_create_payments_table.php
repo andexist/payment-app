@@ -20,7 +20,6 @@ class CreatePaymentsTable extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedInteger('account_id')->index();
-            $table->string('payment_provider');
             $table->double('fee', 20, 2)->nullable();
             $table->double('amount', 20, 2)->nullable();
             $table->string('currency');
