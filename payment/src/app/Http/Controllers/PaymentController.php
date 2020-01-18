@@ -142,6 +142,6 @@ class PaymentController extends Controller
             throw new ApiException($exception->getMessage());
         }
 
-        return response()->json()->setStatusCode(Response::HTTP_OK);
+        return response()->json($rejectedPayment)->setStatusCode(Response::HTTP_OK);
     }
 }

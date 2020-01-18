@@ -2,7 +2,6 @@
 
 namespace App\Services\ClientService;
 
-use App\Account;
 use App\Client;
 use App\Repository\ClientRepository;
 use App\Services\ClientService\Utils\ClientHelper;

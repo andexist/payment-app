@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
-use App\Http\Controllers\Requests\CreateAccountRequest;
+use App\Http\Controllers\Requests\AccountRequest\CreateAccountRequest;
 use App\Services\AccountService\AccountService;
 use App\Services\ClientService\ClientService;
 use Illuminate\Database\Eloquent\Collection;
@@ -93,7 +93,7 @@ class AccountController extends Controller
         $decodedContent = json_decode($content, true);
 
         if ($decodedContent === null) {
-            return response()->json(['message' => ClientService::CONTENT_RESPONSE_ERROR])
+            return response()->json(['message' => ApiException::CONTENT_RESPONSE_ERROR])
                 ->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

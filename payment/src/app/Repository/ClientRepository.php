@@ -36,19 +36,19 @@ class ClientRepository implements RepositoryInterface
      */
     public function create(array $data)
     {
-       Client::query()->create($data);
+        Client::query()->create($data);
 
-       /** @var Client $client */
-       $client = Client::query()
-           ->where('username', $data['username'])
-           ->get();
+        /** @var Client $client */
+        $client = Client::query()
+            ->where('username', $data['username'])
+            ->get();
 
-       return [
-           'username' => $client->username,
-           'firstName' => $client->first_name,
-           'lastName' => $client->last_name,
-           'created' => $client->created_at
-       ];
+        return [
+            'username' => $client->username,
+            'firstName' => $client->first_name,
+            'lastName' => $client->last_name,
+            'created' => $client->created_at
+        ];
     }
 
     public function update(int $id, array $data)

@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Requests;
+namespace App\Http\Controllers\Requests\AccountRequest;
 
 use App\Account;
-use App\Payment;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**

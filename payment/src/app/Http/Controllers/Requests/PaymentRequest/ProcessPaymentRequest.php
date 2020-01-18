@@ -23,7 +23,6 @@ class ProcessPaymentRequest extends FormRequest
         ];
     }
 
-
     /**
      * Get the error messages for the defined validation rules.
      *
@@ -32,7 +31,7 @@ class ProcessPaymentRequest extends FormRequest
     public function messages()
     {
         return [
-            'code.in'  => 'Invalid verification code.',
+            'code.in' => 'Invalid verification code.',
         ];
     }
 }
