@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ApiException extends Exception
 {
+    const CONTENT_RESPONSE_ERROR = 'Could not parse content';
+    const UNCONFIRMED_PAYMENT_ERROR = 'You need to \'CONFIRM\' or \'REJECT\' last payment before creating new one. Payment id: ';
+
     /**
      * @var string
      */

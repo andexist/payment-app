@@ -7,6 +7,8 @@ use App\Repository\PaymentRepository;
 use App\Services\AccountService\AccountService;
 use App\Services\PaymentService\Utils\PaymentHelper;
 use Illuminate\Database\Eloquent\Collection;
+use App\Payment;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class PaymentService
@@ -87,24 +89,30 @@ class PaymentService
     }
 
     /**
-     * @param int $clientId
-     * @return Collection
+     * @param int $accountId
+     * @return Payment|Builder
      */
-    public function getWaitingPaymentsByClientId(int $clientId)
+    public function getUnconfirmedPayment(int $accountId)
     {
-        /** @var array $accountIds */
-        $accountIds = $this->getClientAccountsIds($clientId);
-
-        return $this->paymentRepository->getWaitingPaymentsByAccountsIds($accountIds);
+        return $this->paymentRepository->getUnconfirmedPayment($accountId);
     }
 
     /**
-     * @param Collection $clientPayments
-     * @return Collection
+     * @param int $paymentId
+     * @return array
      */
-    public function confirmClientPayments(Collection $clientPayments)
+    public function confirmPayment(int $paymentId)
     {
-        return $this->paymentRepository->confirmClientPayments($clientPayments);
+        return $this->paymentRepository->confirmPayment($paymentId);
+    }
+
+    /**
+     * @param int $paymentId
+     * @return array
+     */
+    public function rejectPayment(int $paymentId)
+    {
+        return $this->paymentRepository->rejectPayment($paymentId);
     }
 
     /**

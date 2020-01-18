@@ -15,8 +15,6 @@ use Illuminate\Database\Eloquent\Collection;
  */
 class ClientService
 {
-    const CONTENT_RESPONSE_ERROR = 'Could not parse content';
-
     /**
      * @var ClientRepository
      */

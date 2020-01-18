@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Requests;
+namespace App\Http\Controllers\Requests\PaymentRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,7 +18,7 @@ class ProcessPaymentRequest extends FormRequest
     public function rules()
     {
         return [
-            'clientId' => 'exists:clients,id|required',
+            'paymentId' => 'exists:payments,id|required',
             'code' => 'required|in:111'
         ];
     }

@@ -105,35 +105,61 @@ class PaymentRepository implements RepositoryInterface
     }
 
     /**
-     * @param array $accountsIds
-     * @return Collection
+     * @param int $accountId
+     * @return Payment|Builder
      */
-    public function getWaitingPaymentsByAccountsIds(array $accountsIds)
+    public function getUnconfirmedPayment(int $accountId)
     {
         return Payment::query()
-            ->whereIn('account_id', $accountsIds)
+            ->where('account_id', $accountId)
             ->where('status', Payment::STATUS_WAITING)
-            ->get();
+            ->orderByDesc('id')
+            ->limit(1)
+            ->first();
     }
 
     /**
-     * @param Collection $clientPayments
-     * @return Builder[]|Collection
+     * @param int $paymentId
+     * @return array
      */
-    public function confirmClientPayments(Collection $clientPayments)
+    public function confirmPayment(int $paymentId)
     {
-        $approvedPayments = [];
+        /** @var Payment $payment */
+        $payment = $this->getById($paymentId);
+        $payment->status = Payment::STATUS_APPROVED;
+        $payment->save();
 
-        foreach ($clientPayments as $clientPayment) {
-            $payment = $this->getById($clientPayment->id);
-            $payment->status = Payment::STATUS_APPROVED;
-            $payment->save();
-            $approvedPayments[] = $payment->id;
-        }
+        return [
+            'payment_id' => $payment->id,
+            'details' => $payment->details,
+            'receiver_account' => $payment->receiver_account,
+            'receiver_name' => $payment->receiver_name,
+            'amount' => $payment->amount,
+            'fee' => $payment->fee,
+            'status' => $payment->status,
+        ];
+    }
 
-        return Payment::query()
-            ->whereIn('id', $approvedPayments)
-            ->get();
+    /**
+     * @param int $paymentId
+     * @return array
+     */
+    public function rejectPayment(int $paymentId)
+    {
+        /** @var Payment $payment */
+        $payment = $this->getById($paymentId);
+        $payment->status = Payment::STATUS_REJECTED;
+        $payment->save();
+
+        return [
+            'payment_id' => $payment->id,
+            'details' => $payment->details,
+            'receiver_account' => $payment->receiver_account,
+            'receiver_name' => $payment->receiver_name,
+            'amount' => $payment->amount,
+            'fee' => $payment->fee,
+            'status' => $payment->status,
+        ];
     }
 
     /**
@@ -156,28 +182,28 @@ class PaymentRepository implements RepositoryInterface
     {
         Payment::query()->whereIn('id', $paymentsIds)
             ->update([
-            'status' => Payment::STATUS_COMPLETED
-        ]);
+                'status' => Payment::STATUS_COMPLETED
+            ]);
 
         /** @var Payment $payments */
         $payments = Payment::query()
             ->whereIn('id', $paymentsIds)
             ->get();
 
-       $paymentsArray = [];
+        $paymentsArray = [];
 
-       foreach ($payments as $payment) {
-           $paymentsArray[] = [
-               'payment_id' => $payment->id,
-               'details' => $payment->details,
-               'receiver_account' => $payment->receiver_account,
-               'receiver_name' => $payment->receiver_name,
-               'amount' => $payment->amount,
-               'fee' => $payment->fee,
-               'status' => $payment->status,
-           ];
-       }
+        foreach ($payments as $payment) {
+            $paymentsArray[] = [
+                'payment_id' => $payment->id,
+                'details' => $payment->details,
+                'receiver_account' => $payment->receiver_account,
+                'receiver_name' => $payment->receiver_name,
+                'amount' => $payment->amount,
+                'fee' => $payment->fee,
+                'status' => $payment->status,
+            ];
+        }
 
-       return $paymentsArray;
+        return $paymentsArray;
     }
 }
