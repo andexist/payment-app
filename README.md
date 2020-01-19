@@ -88,9 +88,13 @@ Examples
       "paymentId": 1,
     }  
     
- Note: you canot create new payment unti you approve/reject last one
+ Note: you canot create new payment until you approve/reject last one
  
 Complete payments
 * docker ecex -it payment bash
-* payments:process 1 (1 is client Id)
+* php artisan payments:process 1 (1 is client Id)
+
+Run test
+* docker ecex -it payment bash
+* vendor/bin/phpunit
   
