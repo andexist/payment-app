@@ -56,10 +56,10 @@ Examples
 
 (clients)
 * api/clients/create: {
-* "username": "superman",
-* "firstName": "Kent",
-* "lastName": "Clark"
-}
+      "username": "superman",
+      "firstName": "Kent",
+      "lastName": "Clark"
+     }
     
   (accounts)
     api/accounts/create: {
