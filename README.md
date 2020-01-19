@@ -2,28 +2,28 @@
 payment app with laravel and docker
 
 Run => 
-	* payment-app:~ docker-compose up -d
+* payment-app:~ docker-compose up -d
 Run migrations => 
-	* docker exec -it payment bash
- 	* php artisan migrate
+* docker exec -it payment bash
+* php artisan migrate
       
 Run generate app key if not working
-    * php artisan key:generate
-    * php artisan config:cache
+* php artisan key:generate
+* php artisan config:cache
 
 Api:
 (clients)
-    * api/clients => get all clients
-    * api/clients/{id} => get client
-    * api/clients/{clientId}/accounts => get client accounts
-    * api/clients/{clientId}/pymnets => get client payments
-    * api/clients/create => create client
+* api/clients => get all clients
+* api/clients/{id} => get client
+* api/clients/{clientId}/accounts => get client accounts
+* api/clients/{clientId}/pymnets => get client payments
+* api/clients/create => create client
 
 (accounts)
-    * api/accounts => get all accounts
-    * api/accounts/{id} => get account
-    * api/accounsts/{accountId}/payments => get account paymenst
-    * api/accounts/create => create account
+* api/accounts => get all accounts
+* api/accounts/{id} => get account
+* api/accounsts/{accountId}/payments => get account paymenst
+* api/accounts/create => create account
 
 Api (payments)
 * api/payments/create => create payment
@@ -33,33 +33,33 @@ Api (payments)
 
 Validation:
 (clients)
-    * username: required|unique
-    * firstName: required
-    * lastName: required
+* username: required|unique
+* firstName: required
+* lastName: required
     
- (accounts)
-     * clientId: required|exists in clients table
-     * accountName: required
-     * iban: required|max32|regex(2 letters min 9 numbers: exmpl => LT123456789)
-     * balance: required|min0
-     * currency: required|in Available currencies [EUR, USD, GBP], you can add more in Account model
+(accounts)
+* clientId: required|exists in clients table
+* accountName: required
+* iban: required|max32|regex(2 letters min 9 numbers: exmpl => LT123456789)
+* balance: required|min0
+* currency: required|in Available currencies [EUR, USD, GBP], you can add more in Account model
  
-  (payments)
-       * accountId: required|exists in accounts table
-       * currency: required|in Available currencies [EUR, USD, GBP], you can add more in Account model
-       * amount: required
-       * receiverAccount: required
-       * receiverName: required
-       * details: required
+(payments)
+* accountId: required|exists in accounts table
+* currency: required|in Available currencies [EUR, USD, GBP], you can add more in Account model
+* amount: required
+* receiverAccount: required
+* receiverName: required
+* details: required
   
-  Examples
-  
-  (clients)
-   * api/clients/create: {
-      * "username": "superman",
-      * "firstName": "Kent",
-      * "lastName": "Clark"
-    }
+Examples
+
+(clients)
+* api/clients/create: {
+* "username": "superman",
+* "firstName": "Kent",
+* "lastName": "Clark"
+}
     
   (accounts)
     api/accounts/create: {
