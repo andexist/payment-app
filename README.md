@@ -24,9 +24,9 @@ Api:
     api/accounts/create => create account
 
 Api (payments)
-*api/payments/create => create payment
-*api/payments/approve => approve payment
-*api/payments/reject => reject payment
+* api/payments/create => create payment
+* api/payments/approve => approve payment
+* api/payments/reject => reject payment
 
 
 Validation:
