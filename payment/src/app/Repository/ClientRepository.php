@@ -4,6 +4,7 @@
 namespace App\Repository;
 
 use App\Client;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -40,14 +41,14 @@ class ClientRepository implements RepositoryInterface
 
         /** @var Client $client */
         $client = Client::query()
-            ->where('username', $data['username'])
-            ->get();
+            ->latest()
+            ->first();
 
         return [
             'username' => $client->username,
             'firstName' => $client->first_name,
             'lastName' => $client->last_name,
-            'created' => $client->created_at
+            'createdAt' => $client->created_at->toDateTimeString(),
         ];
     }
 
