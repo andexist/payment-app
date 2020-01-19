@@ -26,6 +26,7 @@ class AccountTest extends TestCase
 
     public function testAccountCanBeAddedThroughApiRequest()
     {
+        $this->clearTable();
         $this->createClient();
         $response = $this->postJson('api/accounts/create', $this->accountData());
         $response->assertStatus(200);

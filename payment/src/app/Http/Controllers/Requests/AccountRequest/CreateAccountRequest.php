@@ -22,7 +22,7 @@ class CreateAccountRequest extends FormRequest
             'clientId' => 'required|exists:clients,id',
             'accountName' => 'required',
             'iban' => 'required|max:32|unique:accounts|regex:/^[A-Z]{2}[A-Z0-9]{9,30}$/',
-            'amount' => 'required|numeric|min:0',
+            'balance' => 'required|numeric|min:0',
             'currency' => 'required|in:' . implode(",", Account::AVAILABLE_CURRENCIES)
         ];
     }

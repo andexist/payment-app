@@ -19,7 +19,7 @@ class AccountHelper
             'client_id' => $data['clientId'],
             'account_name' => trim($data['accountName']),
             'iban' => trim($data['iban']),
-            'balance' => $data['amount'],
+            'balance' => $data['balance'],
             'currency' => $data['currency'],
         ];
     }
