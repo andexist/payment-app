@@ -61,23 +61,23 @@ Examples
       "lastName": "Clark"
      }
     
-  (accounts)
-    api/accounts/create: {
+(accounts)
+* api/accounts/create: {
       "clientId": 1,
       "accountName": "EUR account",
       "iban": "LT123456789",
       "amount": 312.52,
       "currency": "EUR",
-    }
+}
     
-  (payments)
-    api/payments/create: {
+(payments)
+* api/payments/create: {
       "accountId": 1,
       "currency": "EUR",
       "receiverAccount": "LT987654321",
       "receiverName": "Batman",
       "details": "debt on a kebab",
-    }  
+}  
     
     api/payments/approve: {
       "paymentId": 1,
@@ -90,7 +90,7 @@ Examples
     
  Note: you canot create new payment unti you approve/reject last one
  
- Complete payments
-  docker ecex -it payment bash
-  payments:process 1 (1 is client Id)
+Complete payments
+* docker ecex -it payment bash
+* payments:process 1 (1 is client Id)
   
